@@ -90,7 +90,7 @@ class TasksController extends Controller
         ]);
         }
          // 前のURLへリダイレクトさせる
-        return back();
+        return redirect('/');
         
          
     
@@ -116,6 +116,8 @@ class TasksController extends Controller
             'task' => $task,
         ]);
         }
+        
+        return redirect('/');
         
     }
 
