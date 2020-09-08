@@ -80,11 +80,22 @@ class TasksController extends Controller
      */
     public function show($id)
     {
-         $task = Task::findOrFail($id);
-         
-         return view('tasks.show', [
+          // idの値で投稿を検索して取得
+        $task = \App\Task::findOrFail($id);
+
+        // 認証済みユーザ（閲覧者）がその投稿の所有者である場合は
+        if (\Auth::id() === $task->user_id) {
+            return view('tasks.show', [
             'task' => $task,
         ]);
+        }
+         // 前のURLへリダイレクトさせる
+        return back();
+        
+         
+    
+         
+         
     }
 
     /**
@@ -95,11 +106,17 @@ class TasksController extends Controller
      */
     public function edit($id)
     {
-        $task = Task::findOrFail($id);
+        // idの値で投稿を検索して取得
+        $task = \App\Task::findOrFail($id);
+
+        // 認証済みユーザ（閲覧者）がその投稿の所有者である場合は、
+        if (\Auth::id() === $task->user_id) {
         
         return view('tasks.edit', [
             'task' => $task,
         ]);
+        }
+        
     }
 
     /**
@@ -116,16 +133,24 @@ class TasksController extends Controller
             'status' => 'required|max:10',
         ]);
         
-        // 認証済みユーザ（閲覧者）の投稿として作成（リクエストされた値をもとに作成）
-        $request->user()->tasks()->create([
-            'content' => $request->content,
-            'status' => $request->status,
-            
-        ]);
+         // idの値で投稿を検索して取得
+        $task = \App\Task::findOrFail($id);
 
-        // 前のURLへリダイレクトさせる
+        // 認証済みユーザ（閲覧者）がその投稿の所有者である場合は、
+        if (\Auth::id() === $task->user_id) {
+                    // メッセージを更新
+        $task->content = $request->content;
+        $task->status = $request->status;
+        $task->save();
+        }
+
+          // 前のURLへリダイレクトさせる
         return redirect('/');
-    }
+    }       
+            
+    
+
+   
 
     /**
      * Remove the specified resource from storage.
